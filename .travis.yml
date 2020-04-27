@@ -1,0 +1,17 @@
+language: python
+python:
+- 3.8
+- 3.7
+- 3.6
+install: travis_retry pip install -e .[all]
+script: "./run-tests.sh"
+deploy:
+  provider: pypi
+  distributions: sdist bdist_wheel
+  user: egabancho
+  password:
+    secure: q0RbXWkwCs62/z8yIQTbrg7q4x303VwMQ8tmXSj95bN5VVYVZztKZU2Liey2sMPZSyFpjqS2h6l0UJVGQ0gHq+iyU71l93f0kaDZJoQg6NfbkU1oAT6qxasjEUFdX4x9eFDRJ8r9Oo2ttH+cn9w+jyVI6S2dfeeUzPEFbX/tELlII3FbXdNpPtMSlir4FczommS1MavK2C0t/RkfIe8qA3wj6oHDNwG31l2GHDAZGYw15goGmNNLEEsGGhiNLtJDFKJeO34dQUbPIGDcdbZ+bK5ZQuO9MoO6CcWOSM1IzPbwd1eHb0mtwXJ2kMpB1fp+GT2BK0K3FDI79lWZV9KbYy/jDdtI/Xsp6QI/MPyF1FlHJjZCkFZMpe02+/xja5LeuSbfKXOWm63/03vUSGsfPJUwtK3OyBRI9OYMQF8s1hshKZ6dRnBl+nGBhu9nQrqL1zFfXuFkk0D0Lozr+qCFdciD25S6Xpp7E6hX+LpaXSs1nzL6znrPJijX8hQfnK1Ya58MuWne4yMS+BcYViqKqBf9OlLDt2o5sF8CYOpWBgcYlKaq22mZ2Ef8NuyEVRU3wYdthVxG3R2ZznV/5F1jcaimKWqbPvOejnXWECWHGr1ob6qRsBxVUK8k8WiJq8nCHr7sY9n0V5r41VbttvNjcc9cRX87cTnC6cRMxzTa3Vs=
+  on:
+    tags: true
+    repo: egabancho/config-loader
+    python: 3.8
