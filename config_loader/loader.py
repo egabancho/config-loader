@@ -11,7 +11,7 @@ import pkg_resources
 logger = logging.getLogger(__name__)
 
 
-class Config(dict):
+class Config(object):
     """Configuration loader, it's like a normal dictionary with super-powers.
 
     It will load configuration in the following order:
@@ -44,10 +44,42 @@ class Config(dict):
         **kwargs_config
     ):
         """Initialize new configuration loader instance."""
-        self.from_entry_point(entry_point_name)
-        self.from_envvar(env_var)
-        self.update(**kwargs_config)
-        self.from_env(env_prefix)
+        self._internal_config = None
+        self.env_var = env_var
+        self.env_prefix = env_prefix
+        self.entry_point_name = entry_point_name
+        self.extra_config = kwargs_config
+
+    @property
+    def _config(self):
+        """Hide internal configuration for lazy loading."""
+        if self._internal_config is None:
+            self._internal_config = dict()
+            self.build()
+        return self._internal_config
+
+    def __getattr__(self, name):
+        """Fallback to the internal dictionary if attr not found."""
+        return getattr(self._config, name)
+
+    def __repr__(self):
+        """Get repr from the internal dictionary."""
+        return self._config.__repr__()
+
+    def __getitem__(self, key):
+        """Allow for square bracket notation."""
+        return self._config.__getitem__(key)
+
+    def __setitem__(self, key, value):
+        """Allow for square bracket notation."""
+        return self._config.__setitem(key, value)
+
+    def build(self):
+        """Build internal configuration."""
+        self.from_entry_point(self.entry_point_name)
+        self.from_envvar(self.env_var)
+        self._config.update(self.extra_config)
+        self.from_env(self.env_prefix)
 
     def from_entry_point(self, entry_point_name):
         """Update values from module defined by entry point.
@@ -96,7 +128,7 @@ class Config(dict):
         """
         for key in dir(obj):
             if key.isupper():
-                self[key] = getattr(obj, key)
+                self._config[key] = getattr(obj, key)
 
     def from_env(self, prefix):
         """Load configuration from environment variables.
@@ -118,4 +150,4 @@ class Config(dict):
                 pass
 
             # Set value
-            self[varname] = value
+            self._config[varname] = value

@@ -73,14 +73,16 @@ def test_object(config):
     assert config.get('TESTVAR', False)
 
 
-@patch(
-    'pkg_resources.iter_entry_points', _mock_ep([ConfigEP(TESTVAR_EP=True)])
-)
 def test_entry_point(config):
     """Test entry point."""
     assert not config.get('TESTVAR_EP', False)
-    config.from_entry_point('test')
-    assert config.get('TESTVAR_EP', False)
+    # Load mock entrypoint
+    with patch(
+        'pkg_resources.iter_entry_points',
+        _mock_ep([ConfigEP(TESTVAR_EP=True)]),
+    ):
+        config.from_entry_point('test')
+        assert config.get('TESTVAR_EP', False)
 
 
 def test_env(config):
